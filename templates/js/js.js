@@ -476,7 +476,7 @@ var dashboard = {
             'id_box': $('#id_box').val(),
             'filtro_columna': filter_column,
             'tipo_control_grafico': $("#tipo_control_grafico").val(),
-            'control_grafico': $('input[name=control_grafico]:checked').val();
+            'control_grafico': $('input[name=control_grafico]:checked').val(),
         };
         
         var callback = function(response){
@@ -512,6 +512,8 @@ var dashboard = {
         $("#div_guardar_box").hide();
         $("#div_limpiar_box").hide();
         $("#div_previsualizar").hide();
+        $("#div_control_grafico").empty();
+        $("#filter_div").empty();
     },
 
 

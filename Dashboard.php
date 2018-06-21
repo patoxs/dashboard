@@ -718,9 +718,9 @@ class Dashboard extends \Core\BaseModuloHoja
             'eje_y' => $eje_y,
             'columnas' => addslashes(json_encode($columnas)),
             'activo' => 1,
-            'filtro_columna': $filtro_columna,
-            'tipo_control_grafico': $tipo_control_grafico,
-            'control_grafico': $control_grafico,
+            'filtro_columna' => $filtro_columna,
+            'tipo_control_grafico' => $tipo_control_grafico,
+            'control_grafico' => $control_grafico,
         );
         if ($id_box == 0) {
             $mensaje = array('error'=>"Hubo un problema al registrar el box"); 
