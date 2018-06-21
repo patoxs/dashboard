@@ -1,0 +1,8 @@
+;;
+;; Dashboard
+;; idioma español
+;;
+###titulo###=>>Creador de Dashboard
+###menu###=>>Creador de Dashboard
+###footer###=>>
+###header###=>>
