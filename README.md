@@ -1,1 +1,1 @@
-Proyecto de dashboard dinamico, para INDAP
+Proyecto de dashboard dinamico, desarrollado en PHP y Javascript.
