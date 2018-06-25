@@ -1,0 +1,78 @@
+<div id="waiting" hidden="hidden">    
+    <div id="ImagenEspera">
+        <i class="fa fa-refresh fa-spin fa-3x"></i>
+    </div>
+</div>
+<div id="header">
+  <div class="row">
+    <div class="large-6 medium-4 small-5 columns titulo">
+      <h2>###titulo###</h2>
+    </div>
+ 
+    <div class="large-2 medium-2 small-5 columns logoInterior">
+      <img src="templates/unificado/img/logo-interior.png" alt="" class="logoLogin">
+    </div>
+  </div> 
+  <div class="row">
+  	<div class="large-12 columns">
+
+
+  		<nav class="top-bar" data-topbar role="navigation">
+		  
+
+		  <section class="top-bar-section">
+		    <!-- Right Nav Section -->
+		    <ul class="left">
+	
+		      <li class="has-dropdown">
+
+		        <a href="#">Seleccione un informe</a>
+
+		        <ul class="dropdown">
+		        	###dashboards###
+		        </ul>
+
+		      </li>
+		    </ul>
+
+		    
+		  </section>
+		</nav>
+  		
+
+
+
+
+  	</div>
+  </div> 
+</div>
+
+<div class="contenido_blanco">
+  <div class="row">
+    <div class="large-12 columns interior">
+      	<h2>###menu###</h2>
+		<div id="desplega_dashboard"></div>
+		
+
+	</div>
+  </div>
+</div>
+<style>
+#waiting {
+    background: rgba(255, 255, 255, 0.74);
+    z-index: 1010;
+    width: 100%;
+    height: 100%;
+    margin-top: -30px;
+    position: fixed;
+}
+
+.top-bar {
+	background: #FF8100;
+    overflow: visible;
+}
+.top-bar-section li:not(.has-form) a:not(.button) {
+	background: #FF8100;
+}
+</style>
+

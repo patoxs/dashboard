@@ -1,0 +1,8 @@
+;;
+;; DashboardVer
+;; idioma español
+;;
+###titulo###=>>Dashboard
+###menu###=>>Ver Dashboard
+###footer###=>>
+###header###=>>

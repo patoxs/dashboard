@@ -407,6 +407,9 @@ class Dashboard extends \Core\BaseModuloHoja
                     box.eje_x,
                     box.eje_y,
                     box.columnas,
+                    box.filtro_columna,
+                    box.tipo_control_grafico,
+                    box.control_grafico,
                     tipografico.codigo as tipo_grafico
                 FROM dashboard.dashboard as dashboard
                 INNER JOIN core.tipo_ambito as ambito 
@@ -443,9 +446,11 @@ class Dashboard extends \Core\BaseModuloHoja
         $row = '';
         $celda = '';
 
-        for ($i = 0; $i < $total_datos; $i++) {
+        $i = 0;
 
-            extract($datos[$i]);
+
+        foreach ($datos as $temp) {
+            extract($temp);
             $id_celda = uniqid();
             $query = base64_decode( $query );
             $query = $this->revisaFiltro($query, 09, 00, 11);
@@ -453,7 +458,12 @@ class Dashboard extends \Core\BaseModuloHoja
             $columnas = stripslashes($columnas);
             $rand_background = $background_colors[array_rand($background_colors)];
 
-            $celda .= '<div class="large-'.$columna.' columns" style="border-top: solid 4px '.$rand_background.'"><h4>'.$titulo_box.'</h4><div id="div_'.$id_celda.'"></div></div>'; 
+            $filter_div = '';
+            if ($control_grafico == 'Si') {
+                $filter_div = "<div id='filter_div_".$id_celda."' ></div>";
+            }
+
+            $celda .= '<div class="large-'.$columna.' columns" style="border-top: solid 4px '.$rand_background.'"><h4>'.$titulo_box.'</h4>'.$filter_div.'<div id="div_'.$id_celda.'"></div></div>'; 
 
             if (!isset($datos[$i+1]['linea'])) {
                 $row .= '<div class="row">'.$celda.'</div>';   
@@ -481,12 +491,29 @@ class Dashboard extends \Core\BaseModuloHoja
                 $matriz .= "],";
             }
 
-            if ($tipo_grafico == 'Table') {
-                $data['###scriptjs###'] .= $this->creaJsTabla($id_celda, $columnas, $matriz, $eje_x, $eje_y, $tipo_grafico, $arreglo_box[0]);
-            } else {
-                $data['###scriptjs###'] .= $this->creaJsGrafico($id_celda, $columnas, $matriz, $eje_x, $eje_y, $tipo_grafico);
-            }
+            $datos = array(
+                        "id_celda" => $id_celda, 
+                        "columnas" => $columnas, 
+                        "matriz" => $matriz, 
+                        "eje_x" => $eje_x, 
+                        "eje_y" => $eje_y, 
+                        "tipo_grafico" => $tipo_grafico,
+                    );
 
+            if ($control_grafico == 'Si') {
+                $datos["filter_type"] = $tipo_control_grafico;
+                $datos["filter_column"] = $filtro_columna;
+                $data['###scriptjs###'] .= $this->creaJsDashboard($datos);
+            } else {
+                if ($tipo_grafico == 'Table') {
+                    $datos["arreglo_box"] = $arreglo_box[0];
+                    $data['###scriptjs###'] .= $this->creaJsTabla($datos);
+                } else {
+                    $datos = array();
+                    $data['###scriptjs###'] .= $this->creaJsGrafico($datos);
+                }
+            }
+            $i = $i + 1;
         }
 
         $data['###contenedores###'] = $row;
@@ -502,8 +529,9 @@ class Dashboard extends \Core\BaseModuloHoja
      * @param  $datos array con data con toda la información la procesar la pagina
      * @return string html generado
      */
-    private function creaJsGrafico($id_celda, $columnas, $matriz, $eje_x, $eje_y, $tipo_grafico)
+    private function creaJsGrafico($datos)
     {
+        extract($datos);
         $graficojs = "google.charts.load('current', {'packages':['corechart']});";
         $graficojs .= "google.charts.setOnLoadCallback(draw_grafico_".$id_celda.");";
         $graficojs .= "function draw_grafico_".$id_celda."() {
@@ -524,8 +552,9 @@ class Dashboard extends \Core\BaseModuloHoja
      * @param  $datos array con data con toda la información la procesar la pagina
      * @return string html generado
      */
-    private function creaJsTabla($id_celda, $columnas, $matriz, $eje_x, $eje_y, $tipo_grafico, $arreglo_box)
+    private function creaJsTabla($datos)
     {
+        extract($datos);
         $tablajs = "google.charts.load('current', {'packages':['table']});";
         $tablajs .= "google.charts.setOnLoadCallback(draw_grafico_".$id_celda.");";
         $tablajs .= "function draw_grafico_".$id_celda."() { var data = new google.visualization.DataTable();";
@@ -557,6 +586,42 @@ class Dashboard extends \Core\BaseModuloHoja
                     table.draw(data, options);}";
 
         return $tablajs;
+    }
+
+    /**
+     * Genera el script js para crear un dashboard de google 
+     * @param  $datos array con data con toda la información la procesar la pagina
+     * @return string html generado
+     */
+    private function creaJsDashboard($datos)
+    {
+        extract($datos);
+        $dashboardjs = "google.charts.load('current', {'packages':['corechart', 'controls']});";
+        $dashboardjs .= "google.charts.setOnLoadCallback(draw_grafico_".$id_celda.");";
+        $dashboardjs .= "function draw_grafico_".$id_celda."() {
+                            var data = google.visualization.arrayToDataTable([".$columnas.",".$matriz."]);
+                            var dashboard = new google.visualization.Dashboard(document.getElementById('div_".$id_celda."'));
+                            var filtro = new google.visualization.ControlWrapper({
+                                'controlType': '".$filter_type."',
+                                'containerId': 'filter_div_".$id_celda."',
+                                'options': {
+                                'filterColumnLabel': '".$filter_column."'
+                                }
+                            });
+                            var grafico = new google.visualization.ChartWrapper({
+                                'chartType': '".$tipo_grafico."',
+                                'containerId': 'div_".$id_celda."',
+                                'options': {
+                                    'width': '100%',
+                                    'height': '100%',
+                                    'pieSliceText': 'value',
+                                    'legend': 'right'
+                                }
+                            });
+                            dashboard.bind(filtro, grafico);
+                            dashboard.draw(data);
+                        }";
+        return $dashboardjs;
     }
 
 
